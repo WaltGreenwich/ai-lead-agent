@@ -1,8 +1,10 @@
 {
-  "include": ["backend", "frontend/src"],
-  "exclude": ["**/node_modules", "**/__pycache__", "**/.*"],
+  "include": ["backend"],
+  "exclude": ["**/node_modules", "**/__pycache__", "**/.*", "frontend"],
+  "extraPaths": ["backend"],
   "reportCallIssue": "none",
   "reportGeneralTypeIssues": "warning",
   "pythonVersion": "3.11",
-  "typeCheckingMode": "basic"
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true
 }
