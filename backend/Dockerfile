@@ -1,10 +1,16 @@
-FROM python:3.11-slim
+FROM python:3.11-slim as base
 
 WORKDIR /app
 
-# Install dependencies
+# Producción
+FROM base as production
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Desarrollo
+FROM base as development
+COPY requirements.txt requirements-dev.txt ./
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-dev.txt
 
 # Copy application
 COPY . .

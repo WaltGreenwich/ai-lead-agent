@@ -1,0 +1,8 @@
+{
+  "include": ["backend", "frontend/src"],
+  "exclude": ["**/node_modules", "**/__pycache__", "**/.*"],
+  "reportCallIssue": "none",
+  "reportGeneralTypeIssues": "warning",
+  "pythonVersion": "3.11",
+  "typeCheckingMode": "basic"
+}

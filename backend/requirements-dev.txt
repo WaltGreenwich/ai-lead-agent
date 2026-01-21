@@ -1,0 +1,10 @@
+# Development dependencies
+isort
+black
+pylint
+
+# Testing
+
+pytest==8.0.0
+pytest-asyncio==0.23.3
+pytest-cov==4.1.0
