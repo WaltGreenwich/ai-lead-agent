@@ -1,0 +1,47 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ai-lead-agent-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - AIRTABLE_API_KEY=${AIRTABLE_API_KEY:-}
+      - AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID:-}
+      - AIRTABLE_TABLE_NAME=${AIRTABLE_TABLE_NAME:-Leads}
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - DEBUG=True
+      - HIGH_SCORE_THRESHOLD=80.0
+      - MEDIUM_SCORE_THRESHOLD=60.0
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: ai-lead-agent-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./dashboard:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+networks:
+  default:
+    name: ai-lead-agent-network

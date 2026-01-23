@@ -33,7 +33,7 @@ class LeadQualificationAgent:
     def __init__(self):
         """Initialize Gemini AI"""
         genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = genai.GenerativeModel("gemini-pro")
+        self.model = genai.GenerativeModel("models/gemini-flash-latest")
         logger.info("✅ AI Agent initialized with Gemini")
 
     async def qualify_lead(self, lead: LeadInput) -> Dict:
@@ -47,7 +47,7 @@ class LeadQualificationAgent:
             Dict with score, priority, and analysis
         """
         try:
-            logger.info(f"🤖 Analyzing lead: {lead.name}")
+            logger.info("🤖 Analyzing lead: %s", lead.name)
 
             # Build analysis prompt
             prompt = self._build_prompt(lead)
@@ -76,26 +76,28 @@ class LeadQualificationAgent:
             )
 
             logger.info(
-                f"✅ Lead qualified: {lead.name} (Score: {score}, Priority: {priority})"
+                "✅ Lead qualified: %s (Score: %s, Priority: %s)",
+                lead.name,
+                score,
+                priority,
             )
 
             return {"score": score, "priority": priority, "analysis": analysis}
 
         except Exception as e:
-            logger.error(f"❌ AI analysis failed: {str(e)}")
+            logger.error("❌ AI analysis failed: %s", str(e))
             # Return default safe values
             return {
                 "score": 50.0,
                 "priority": LeadPriority.WARM,
                 "analysis": AIAnalysis(
-                    recommended_action="Manual review required - AI analysis failed"
+                    recommended_action=("Manual review required - AI analysis failed")
                 ),
             }
 
     def _build_prompt(self, lead: LeadInput) -> str:
         """Build analysis prompt for Gemini"""
-        return f"""You are a lead qualification expert.
-        Analyze this lead and provide structured insights.
+        return f"""You are a lead qualification expert. Analyze this lead and provide structured insights.
 
 Lead Information:
 - Name: {lead.name}
@@ -109,8 +111,12 @@ Analyze and provide a JSON response with:
 {{
   "industry": "Primary industry of the company (or 'Unknown')",
   "company_size": "Estimated size: Startup/Small/Medium/Large/Enterprise",
-  "budget_signals": ["List of 0-3 signals indicating budget/buying power"],
-  "pain_points": ["List of 2-4 business pain points mentioned or implied"],
+  "budget_signals": [
+    "List of 0-3 signals indicating budget/buying power"
+  ],
+  "pain_points": [
+    "List of 2-4 business pain points mentioned or implied"
+  ],
   "urgency_level": "high/medium/low based on language and context",
   "buying_intent": "ready_to_buy/evaluating/exploring/just_browsing",
   "recommended_action": "Specific next step for sales team (one sentence)"
@@ -146,8 +152,8 @@ Respond ONLY with valid JSON, no explanation or markdown.
             return json.loads(cleaned)
 
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse AI response: {str(e)}")
-            logger.error(f"Response was: {response_text}")
+            logger.error("Failed to parse AI response: %s", str(e))
+            logger.error("Response was: %s", response_text)
 
             # Return minimal safe structure
             return {
@@ -166,9 +172,11 @@ Respond ONLY with valid JSON, no explanation or markdown.
 
         Scoring factors:
         - Urgency: 30 points (high=30, medium=20, low=10)
-        - Buying intent: 40 points (ready=40, evaluating=30, exploring=20, browsing=10)
+        - Buying intent: 40 points
+          (ready=40, evaluating=30, exploring=20, browsing=10)
         - Budget signals: 15 points (3 signals=15, 2=10, 1=5, 0=0)
-        - Pain points identified: 15 points (4+=15, 3=12, 2=8, 1=4)
+        - Pain points identified: 15 points
+          (4+=15, 3=12, 2=8, 1=4)
 
         Total: 100 points
         """

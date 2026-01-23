@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Sarah Johnson",
+    "email": "sarah@bigcorp.com",
+    "phone": "+1234567890",
+    "company": "BigCorp Inc",
+    "website": "https://bigcorp.com",
+    "message": "We urgently need a CRM solution for our 200-person sales team. We have budget approved for $100k and need to implement ASAP by end of Q1. Our current system is failing and costing us deals every day. I'm the VP of Sales and have authority to make this decision.",
+    "source": "referral"
+  },
+  {
+    "name": "Mike Chen",
+    "email": "mike@startup.io",
+    "phone": "+9876543210",
+    "company": "TechStartup Inc",
+    "website": "https://techstartup.io",
+    "message": "We're a growing startup with about 30 employees looking into CRM options. We'd like to schedule a demo sometime next month to see if your solution fits our needs. Our budget is flexible but we need to see ROI first.",
+    "source": "web_form"
+  },
+  {
+    "name": "Bob Smith",
+    "email": "bob@personal.com",
+    "message": "Just browsing around, saw your website and wanted to learn more about what you do. Not really sure if I need a CRM right now, but maybe in the future. Thanks!",
+    "source": "web_form"
+  },
+  {
+    "name": "Jennifer Martinez",
+    "email": "jennifer@enterprise.com",
+    "phone": "+1555123456",
+    "company": "Enterprise Solutions LLC",
+    "website": "https://enterprise.com",
+    "message": "We're looking to replace our current CRM within 2 weeks. We have 500 users and need enterprise features. Budget is $250k. We need proposal and pricing ASAP. Already evaluated 3 competitors.",
+    "source": "email"
+  },
+  {
+    "name": "Tom Wilson",
+    "email": "tom@smallbiz.com",
+    "company": "Small Business Co",
+    "message": "Hi, I run a small consulting firm with 5 people. Just curious about your pricing and if it works for small teams. Not in a rush, just gathering information.",
+    "source": "phone"
+  }
+]
