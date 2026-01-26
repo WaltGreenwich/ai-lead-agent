@@ -5,7 +5,7 @@ Pytest configuration and fixtures
 import pytest
 from fastapi.testclient import TestClient
 
-from main import app
+from example_main import app
 from models.schemas import LeadSource
 
 

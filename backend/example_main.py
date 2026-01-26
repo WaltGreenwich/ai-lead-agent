@@ -9,17 +9,15 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import get_settings
-from models.schemas import HealthCheck, LeadInput, LeadResponse, QualifiedLead
+from models.schemas import HealthCheck, LeadInput, LeadResponse
 from services.ai_agent import LeadQualificationAgent
-from services.airtable_client import AirtableClient
-
 
 settings = get_settings()
 
 
 # Lifespan context manager
 @asynccontextmanager
-async def lifespan(_: FastAPI):  # El guion bajo indica "ignora este valor"
+async def lifespan(app: FastAPI):
     """Startup and shutdown events"""
     # Startup
     print("🚀 Starting AI Lead Agent...")
@@ -45,9 +43,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize services
+# Initialize AI Agent
 agent = LeadQualificationAgent()
-airtable = AirtableClient()
 
 
 @app.get("/", response_model=HealthCheck)
@@ -71,7 +68,6 @@ async def health_check():
             "api": "running",
             "ai_agent": "operational",
             "gemini_api": "connected",
-            "airtable": "connected",
         },
     )
 
@@ -94,6 +90,7 @@ async def qualify_lead(lead: LeadInput):
         result = await agent.qualify_lead(lead)
 
         # Build qualified lead object
+        from models.schemas import QualifiedLead
 
         qualified_lead = QualifiedLead(
             name=lead.name,
@@ -108,35 +105,11 @@ async def qualify_lead(lead: LeadInput):
             analysis=result["analysis"],
         )
 
-        # Save to Airtable
-        lead_data = {
-            "name": qualified_lead.name,
-            "email": qualified_lead.email,
-            "phone": qualified_lead.phone,
-            "company": qualified_lead.company,
-            "website": qualified_lead.website,
-            "message": qualified_lead.message,
-            "source": qualified_lead.source.value,
-            "score": qualified_lead.score,
-            "priority": qualified_lead.priority.value,
-            "analysis": {
-                "industry": qualified_lead.analysis.industry,
-                "company_size": qualified_lead.analysis.company_size,
-                "urgency_level": qualified_lead.analysis.urgency_level,
-                "buying_intent": qualified_lead.analysis.buying_intent,
-                "pain_points": qualified_lead.analysis.pain_points,
-                "budget_signals": qualified_lead.analysis.budget_signals,
-                "recommended_action": (qualified_lead.analysis.recommended_action),
-            },
-        }
-
-        record_id = airtable.create_lead(lead_data)
-
         processing_time = time.time() - start_time
 
         return LeadResponse(
             success=True,
-            lead_id=record_id,
+            lead_id=None,  # Will be set when Airtable is integrated
             qualified_lead=qualified_lead,
             processing_time=processing_time,
         )
@@ -153,42 +126,6 @@ async def qualify_lead(lead: LeadInput):
 async def test_endpoint():
     """Simple test endpoint"""
     return {"message": "Test endpoint working", "status": "ok"}
-
-
-@app.get("/leads/stats")
-async def get_stats():
-    """Get lead statistics from Airtable"""
-    try:
-        stats = airtable.get_stats()
-        return {
-            "success": True,
-            "stats": stats,
-        }
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to get stats: {str(e)}",
-        ) from e
-
-
-@app.get("/leads/{record_id}")
-async def get_lead(record_id: str):
-    """Get a specific lead by ID"""
-    try:
-        lead = airtable.get_lead(record_id)
-        if not lead:
-            raise HTTPException(status_code=404, detail="Lead not found")
-        return {
-            "success": True,
-            "lead": lead,
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to get lead: {str(e)}",
-        ) from e
 
 
 if __name__ == "__main__":
