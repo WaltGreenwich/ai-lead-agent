@@ -186,7 +186,9 @@ curl -X POST http://localhost:5678/webhook/lead \
   -d '{
     "name": "John Doe",
     "email": "john@example.com",
-    "message": "Looking for enterprise CRM solution",
+    "phone": "+12312312312",
+    "company": "Umbrella Corp",
+    "message": "Looking for mi clinic CRM solution with AI",
     "source": "web_form"
   }'
 ```
