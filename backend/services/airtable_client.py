@@ -49,7 +49,7 @@ class AirtableClient:
                 "Score": float(lead_data["score"]),
                 "Priority": lead_data["priority"],
                 "Status": "new",
-                "Created At": datetime.utcnow().isoformat(),
+                # Don't send Created At - Airtable auto-creates it
             }
 
             # Add AI analysis fields
@@ -162,7 +162,7 @@ class AirtableClient:
                 "hot": 0,
                 "warm": 0,
                 "cold": 0,
-                "avg_score": 0,
+                "avg_score": 0.0,
             }
 
             if all_leads:
@@ -183,7 +183,7 @@ class AirtableClient:
                         scores.append(score)
 
                 if scores:
-                    stats["avg_score"] = round(sum(scores) / len(scores))
+                    stats["avg_score"] = sum(scores) / len(scores)
 
             logger.info("✅ Retrieved stats from Airtable")
             return stats

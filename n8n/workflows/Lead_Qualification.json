@@ -1,0 +1,164 @@
+{
+  "name": "Lead Qualification - Fixed",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead",
+        "options": {}
+      },
+      "id": "a19ad101-c5de-4aa2-be4e-37ece95d56d7",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "1225fe53-0528-4d18-8efb-08e991e99433"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "name-field",
+              "name": "name",
+              "value": "={{ $json.body.name || $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "email-field",
+              "name": "email",
+              "value": "={{ $json.body.email || $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "phone-field",
+              "name": "phone",
+              "value": "={{ $json.body.phone || $json.phone || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "company-field",
+              "name": "company",
+              "value": "={{ $json.body.company || $json.company || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "website-field",
+              "name": "website",
+              "value": "={{ $json.body.website || $json.website || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "message-field",
+              "name": "message",
+              "value": "={{ $json.body.message || $json.message }}",
+              "type": "string"
+            },
+            {
+              "id": "source-field",
+              "name": "source",
+              "value": "={{ $json.body.source || $json.source || 'web_form' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b7043254-a5af-4db1-a06e-5af8042f88cb",
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://backend:8000/leads",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={{\n  {\n    \"name\": $json.name,\n    \"email\": $json.email,\n    \"phone\": $json.phone || \"\",\n    \"company\": $json.company || \"\",\n    \"website\": $json.website || \"\",\n    \"message\": $json.message,\n    \"source\": $json.source\n  }\n}}",
+        "options": {}
+      },
+      "id": "389648df-212a-4608-8224-54234a360a62",
+      "name": "Call API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "id": "3eec6aac-745c-4104-9748-780111317489",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Call API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call API": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "5c1ca3be-1487-47d3-b3dd-2fe7982e728d",
+  "meta": {
+    "instanceId": "635c9344510ee184d093e207a61c9e7e6cb56c7aa153316bfa2d86fb418cf15a"
+  },
+  "id": "m6HzE8X1khuqhsWkTPMRD",
+  "tags": []
+}
